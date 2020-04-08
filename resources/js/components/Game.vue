@@ -5,7 +5,7 @@
     <h3>Players</h3>
     <p v-for="(player, index) in this.match.players" :key="player.id" v-bind:class="{ 'text-danger': index == match.turnIndex }"> {{ player.name }}</p>
   
-    <form v-if="myTurn" @submit.prevent="onSubmit">
+    <form v-if="myTurn && match.identifier.length > 0" @submit.prevent="onSubmit">
       <button type="submit">Deal a card!</button>
     </form>
 
@@ -19,21 +19,30 @@
 
 <script>
 import socketio from 'socket.io-client';
-const socket = socketio('http://127.0.0.1:3333')
+var socket
 
 export default {
   mounted() {
-    axios.get(`http://127.0.0.1:3333/match/${this.$route.params.identifier}`).then(response => {
-      this.match = response.data
-      this.setMyTurn()
-    })
+    this.fetchData().then(() => {
+      const socketConnection = () => {
+        return socketio('http://127.0.0.1:3333', {
+          query: 'match='+this.match.identifier
+        });
+      }
 
-    socket.on('dealt a card', (response) => {
-      console.log('dealt a card bob!')
-      // The response from this is the same as the initial call
-      this.match = response
-      this.setMyTurn()
-    });
+      socket = socketConnection(this.match.identifier)
+
+      socket.on('dealt a card', (response) => {
+        console.log('dealt a card bob!')
+        // The response from this is the same as the initial call
+        this.match = response
+        this.setMyTurn()
+      });
+
+      socket.on('player joined', (response) => {
+        this.fetchData()
+      })
+    })
   },
 
   data() {
@@ -54,10 +63,19 @@ export default {
 
   methods: {
     onSubmit() {
-      socket.emit('dealt a card', this.match.identifier)
+      if (this.match.identifier) { // Only want to do this if identifier is set
+        socket.emit('dealt a card', this.match.identifier)
+      }
     },
     setMyTurn() {
       this.myTurn = this.match.players[this.match.turnIndex].id == JSON.parse(localStorage.player).id
+    },
+
+    fetchData() {
+      return axios.get(`http://127.0.0.1:3333/match/${this.$route.params.identifier}`).then(response => {
+        this.match = response.data
+        this.setMyTurn()
+      })
     }
   }
 }

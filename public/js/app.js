@@ -2093,22 +2093,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
-var socket = socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()('http://127.0.0.1:3333');
+var socket;
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
 
-    axios.get("http://127.0.0.1:3333/match/".concat(this.$route.params.identifier)).then(function (response) {
-      _this.match = response.data;
+    this.fetchData().then(function () {
+      var socketConnection = function socketConnection() {
+        return socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()('http://127.0.0.1:3333', {
+          query: 'match=' + _this.match.identifier
+        });
+      };
 
-      _this.setMyTurn();
-    });
-    socket.on('dealt a card', function (response) {
-      console.log('dealt a card bob!'); // The response from this is the same as the initial call
+      socket = socketConnection(_this.match.identifier);
+      socket.on('dealt a card', function (response) {
+        console.log('dealt a card bob!'); // The response from this is the same as the initial call
 
-      _this.match = response;
+        _this.match = response;
 
-      _this.setMyTurn();
+        _this.setMyTurn();
+      });
+      socket.on('player joined', function (response) {
+        _this.fetchData();
+      });
     });
   },
   data: function data() {
@@ -2128,10 +2135,22 @@ var socket = socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()('http://127
   },
   methods: {
     onSubmit: function onSubmit() {
-      socket.emit('dealt a card', this.match.identifier);
+      if (this.match.identifier) {
+        // Only want to do this if identifier is set
+        socket.emit('dealt a card', this.match.identifier);
+      }
     },
     setMyTurn: function setMyTurn() {
       this.myTurn = this.match.players[this.match.turnIndex].id == JSON.parse(localStorage.player).id;
+    },
+    fetchData: function fetchData() {
+      var _this2 = this;
+
+      return axios.get("http://127.0.0.1:3333/match/".concat(this.$route.params.identifier)).then(function (response) {
+        _this2.match = response.data;
+
+        _this2.setMyTurn();
+      });
     }
   }
 });
@@ -47848,7 +47867,7 @@ var render = function() {
         )
       }),
       _vm._v(" "),
-      _vm.myTurn
+      _vm.myTurn && _vm.match.identifier.length > 0
         ? _c(
             "form",
             {
@@ -63297,14 +63316,15 @@ __webpack_require__.r(__webpack_exports__);
 /*!******************************************!*\
   !*** ./resources/js/components/Game.vue ***!
   \******************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Game_vue_vue_type_template_id_3a2c79dd___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game.vue?vue&type=template&id=3a2c79dd& */ "./resources/js/components/Game.vue?vue&type=template&id=3a2c79dd&");
 /* harmony import */ var _Game_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Game.vue?vue&type=script&lang=js& */ "./resources/js/components/Game.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Game_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Game_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -63334,7 +63354,7 @@ component.options.__file = "resources/js/components/Game.vue"
 /*!*******************************************************************!*\
   !*** ./resources/js/components/Game.vue?vue&type=script&lang=js& ***!
   \*******************************************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
