@@ -38,7 +38,7 @@
 
         methods: {
             onSubmit() {
-                axios.post('http://127.0.0.1:3333/player', { name: this.name }).then(response => {
+                axios.post(`${process.env.MIX_API}/player`, { name: this.name }).then(response => {
                     if (response.status == 200) {
                         localStorage.player = JSON.stringify(response.data.player)
                         this.isHidden = true

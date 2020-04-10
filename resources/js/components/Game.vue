@@ -25,7 +25,7 @@ export default {
   mounted() {
     this.fetchData().then(() => {
       const socketConnection = () => {
-        return socketio('http://127.0.0.1:3333', {
+        return socketio(process.env.MIX_API, {
           query: 'match='+this.match.identifier
         });
       }
@@ -72,7 +72,7 @@ export default {
     },
 
     fetchData() {
-      return axios.get(`http://127.0.0.1:3333/match/${this.$route.params.identifier}`).then(response => {
+      return axios.get(`${process.env.MIX_API}/match/${this.$route.params.identifier}`).then(response => {
         this.match = response.data
         this.setMyTurn()
       })

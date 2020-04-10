@@ -25,7 +25,8 @@ import router from '../routes';
 
 export default {
     mounted() {
-        axios.get('http://127.0.0.1:3333/games').then(response => {
+        console.log()
+        axios.get(`${process.env.MIX_API}/games`).then(response => {
             if (response.status == 200) {
                 this.games = response.data
             }
@@ -42,7 +43,7 @@ export default {
 
     methods: {
         joinMatch() {
-            axios.post('http://127.0.0.1:3333/match/join', { player: JSON.parse(localStorage.player).id, match: this.match }).then(response => {
+            axios.post(`${process.env.MIX_API}/match/join`, { player: JSON.parse(localStorage.player).id, match: this.match }).then(response => {
                 console.log(response.data)
 
                 if (response.status == 200) {
@@ -54,8 +55,7 @@ export default {
         },
 
         createMatch() {
-            // TODO: Call API to create a match
-            axios.post('http://127.0.0.1:3333/match', { game: this.selectedGame, owner: JSON.parse(localStorage.player).id }).then(response => {
+            axios.post(`${process.env.MIX_API}/match`, { game: this.selectedGame, owner: JSON.parse(localStorage.player).id }).then(response => {
                 console.log(response.data.match.identifier)
                 if (response.status == 200) {
                     router.push(`/match/${response.data.match.identifier}`)
