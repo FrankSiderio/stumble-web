@@ -1,20 +1,20 @@
 <template>
-    <div class="card">
-        <div class="card-header">Join or Create</div>
+    <div class="card mt-4">
+        <div class="card-header">Join a Game or Create Your Own!</div>
 
         <div class="card-body">
-            <form @submit.prevent="joinMatch">
-                <input type="text" id="match" name="match" v-model="match" />
+            <form class="d-flex" @submit.prevent="joinMatch">
+                <input class="form-control mr-4" type="text" id="match" name="match" v-model="match" placeholder="Game Code" />
 
-                <button class="" type="submit">Join</button>
+                <button class="btn btn-primary" type="submit">Join</button>
             </form>
 
-            <form @submit.prevent="createMatch">
-                <!-- <input type="text" id="match" name="match" v-model="match" /> -->
-                <select class="form-control" name="people" v-model="selectedGame">
+            <form class="d-flex mt-4" @submit.prevent="createMatch">
+                <select class="form-control mr-4" name="people" v-model="selectedGame">
+                    <option disabled selected value> -- select a game -- </option>
                     <option v-for="game in this.games" :key="game.id" v-bind:value="game.id">{{ game.name }}</option>
                 </select>
-                <button class="" type="submit">Create</button>
+                <button class="btn btn-primary" type="submit">Create</button>
             </form>
         </div>
     </div>

@@ -2016,7 +2016,7 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     console.log();
-    axios.get("".concat("https://stumble-api.herokuapp.com", "/games")).then(function (response) {
+    axios.get("".concat("http://127.0.0.1:3333", "/games")).then(function (response) {
       if (response.status == 200) {
         _this.games = response.data;
       }
@@ -2033,7 +2033,7 @@ __webpack_require__.r(__webpack_exports__);
     joinMatch: function joinMatch() {
       var _this2 = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match/join"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match/join"), {
         player: JSON.parse(localStorage.player).id,
         match: this.match
       }).then(function (response) {
@@ -2046,7 +2046,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     createMatch: function createMatch() {
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match"), {
         game: this.selectedGame,
         owner: JSON.parse(localStorage.player).id
       }).then(function (response) {
@@ -2092,6 +2092,28 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 var socket;
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2100,53 +2122,70 @@ var socket;
 
     this.fetchData().then(function () {
       var socketConnection = function socketConnection() {
-        return socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()("https://stumble-api.herokuapp.com", {
-          query: 'match=' + _this.match.identifier
+        return socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()("http://127.0.0.1:3333", {
+          query: "match=" + _this.match.identifier
         });
       };
 
       socket = socketConnection(_this.match.identifier);
-      socket.on('dealt a card', function (response) {
-        console.log('dealt a card bob!'); // The response from this is the same as the initial call
-
+      socket.on("dealt a card", function (response) {
+        // The response from this is the same as the initial call
+        _this.match = response;
+      });
+      socket.on("completed a turn", function (response) {
+        // console.log('completed turn')
+        // console.log(response)
         _this.match = response;
 
         _this.setMyTurn();
       });
-      socket.on('player joined', function (response) {
+      socket.on("player joined", function (response) {
+        _this.fetchData();
+      });
+      socket.on("player left", function (response) {
         _this.fetchData();
       });
     });
   },
   data: function data() {
     return {
+      dealtACard: false,
       myTurn: false,
       match: {
-        turnIndex: '',
-        drinkingGame: {},
-        identifier: '',
+        turnIndex: "",
+        drinkingGame: {
+          name: ''
+        },
+        identifier: "",
         players: [],
         latestCard: {
-          description: '',
-          card: ''
+          description: "",
+          card: ""
         }
       }
     };
   },
   methods: {
-    onSubmit: function onSubmit() {
+    onSubmitTurn: function onSubmitTurn() {
       if (this.match.identifier) {
-        // Only want to do this if identifier is set
-        socket.emit('dealt a card', this.match.identifier);
+        socket.emit("dealt a card", this.match.identifier);
+        this.dealtACard = true;
+      }
+    },
+    onSubmitComplete: function onSubmitComplete() {
+      if (this.match.identifier) {
+        socket.emit("completed a turn", this.match.identifier);
+        this.dealtACard = false;
       }
     },
     setMyTurn: function setMyTurn() {
+      console.log(this.match.turnIndex);
       this.myTurn = this.match.players[this.match.turnIndex].id == JSON.parse(localStorage.player).id;
     },
     fetchData: function fetchData() {
       var _this2 = this;
 
-      return axios.get("".concat("https://stumble-api.herokuapp.com", "/match/").concat(this.$route.params.identifier)).then(function (response) {
+      return axios.get("".concat("http://127.0.0.1:3333", "/match/").concat(this.$route.params.identifier)).then(function (response) {
         _this2.match = response.data;
 
         _this2.setMyTurn();
@@ -2167,6 +2206,8 @@ var socket;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Create_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../components/Create.vue */ "./resources/js/components/Create.vue");
+/* harmony import */ var _components_Player_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Player.vue */ "./resources/js/components/Player.vue");
+//
 //
 //
 //
@@ -2189,9 +2230,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    Create: _components_Create_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+    Create: _components_Create_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    Player: _components_Player_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
@@ -2206,7 +2249,7 @@ __webpack_require__.r(__webpack_exports__);
     onSubmit: function onSubmit() {
       var _this = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/player"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/player"), {
         name: this.name
       }).then(function (response) {
         if (response.status == 200) {
@@ -2217,6 +2260,35 @@ __webpack_require__.r(__webpack_exports__);
         return console.log(error);
       });
     }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Player.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Player.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      player: JSON.parse(localStorage.player)
+    };
   }
 });
 
@@ -47731,13 +47803,16 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "card" }, [
-    _c("div", { staticClass: "card-header" }, [_vm._v("Join or Create")]),
+  return _c("div", { staticClass: "card mt-4" }, [
+    _c("div", { staticClass: "card-header" }, [
+      _vm._v("Join a Game or Create Your Own!")
+    ]),
     _vm._v(" "),
     _c("div", { staticClass: "card-body" }, [
       _c(
         "form",
         {
+          staticClass: "d-flex",
           on: {
             submit: function($event) {
               $event.preventDefault()
@@ -47755,7 +47830,13 @@ var render = function() {
                 expression: "match"
               }
             ],
-            attrs: { type: "text", id: "match", name: "match" },
+            staticClass: "form-control mr-4",
+            attrs: {
+              type: "text",
+              id: "match",
+              name: "match",
+              placeholder: "Game Code"
+            },
             domProps: { value: _vm.match },
             on: {
               input: function($event) {
@@ -47767,13 +47848,18 @@ var render = function() {
             }
           }),
           _vm._v(" "),
-          _c("button", { attrs: { type: "submit" } }, [_vm._v("Join")])
+          _c(
+            "button",
+            { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+            [_vm._v("Join")]
+          )
         ]
       ),
       _vm._v(" "),
       _c(
         "form",
         {
+          staticClass: "d-flex mt-4",
           on: {
             submit: function($event) {
               $event.preventDefault()
@@ -47793,7 +47879,7 @@ var render = function() {
                   expression: "selectedGame"
                 }
               ],
-              staticClass: "form-control",
+              staticClass: "form-control mr-4",
               attrs: { name: "people" },
               on: {
                 change: function($event) {
@@ -47811,17 +47897,29 @@ var render = function() {
                 }
               }
             },
-            _vm._l(this.games, function(game) {
-              return _c(
+            [
+              _c(
                 "option",
-                { key: game.id, domProps: { value: game.id } },
-                [_vm._v(_vm._s(game.name))]
-              )
-            }),
-            0
+                { attrs: { disabled: "", selected: "", value: "" } },
+                [_vm._v(" -- select a game -- ")]
+              ),
+              _vm._v(" "),
+              _vm._l(this.games, function(game) {
+                return _c(
+                  "option",
+                  { key: game.id, domProps: { value: game.id } },
+                  [_vm._v(_vm._s(game.name))]
+                )
+              })
+            ],
+            2
           ),
           _vm._v(" "),
-          _c("button", { attrs: { type: "submit" } }, [_vm._v("Create")])
+          _c(
+            "button",
+            { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+            [_vm._v("Create")]
+          )
         ]
       )
     ])
@@ -47849,55 +47947,120 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    [
-      _c("h1", [_vm._v(_vm._s(this.match.drinkingGame.name))]),
-      _vm._v(" "),
-      _c("h3", [_vm._v("Players")]),
-      _vm._v(" "),
-      _vm._l(this.match.players, function(player, index) {
-        return _c(
-          "p",
-          {
-            key: player.id,
-            class: { "text-danger": index == _vm.match.turnIndex }
-          },
-          [_vm._v(" " + _vm._s(player.name))]
-        )
-      }),
-      _vm._v(" "),
-      _vm.myTurn && _vm.match.identifier.length > 0
-        ? _c(
-            "form",
-            {
-              on: {
-                submit: function($event) {
-                  $event.preventDefault()
-                  return _vm.onSubmit($event)
-                }
-              }
-            },
-            [
-              _c("button", { attrs: { type: "submit" } }, [
-                _vm._v("Deal a card!")
-              ])
-            ]
+  return _c("div", { staticClass: "align-items-center d-flex flex-column" }, [
+    _c("h2", [_vm._v("Playing - " + _vm._s(this.match.drinkingGame.name))]),
+    _vm._v(" "),
+    _c("p", [_vm._v("Game Code - " + _vm._s(this.match.identifier))]),
+    _vm._v(" "),
+    _c("div", { staticClass: "d-flex" }, [
+      _c(
+        "div",
+        { staticClass: "card mx-4", staticStyle: { height: "fit-content" } },
+        [
+          _c("div", { staticClass: "card-header" }, [_vm._v("Players")]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "card-body" },
+            _vm._l(this.match.players, function(player, index) {
+              return _c(
+                "p",
+                {
+                  key: player.id,
+                  class: { "text-danger": index == _vm.match.turnIndex }
+                },
+                [_vm._v(_vm._s(player.name))]
+              )
+            }),
+            0
           )
-        : _vm._e(),
+        ]
+      ),
       _vm._v(" "),
-      _vm.match.latestCard
-        ? _c("div", [
-            _c("h2", [_vm._v("Latest Dealt Card")]),
+      _c(
+        "div",
+        { staticClass: "d-flex", staticStyle: { width: "min-content" } },
+        [
+          _c("div", [
+            _c("img", {
+              staticStyle: { width: "250px" },
+              attrs: {
+                src: __webpack_require__(/*! ../../../public/images/cards/blue_back.png */ "./public/images/cards/blue_back.png")
+              }
+            }),
             _vm._v(" "),
-            _c("p", [_vm._v(_vm._s(this.match.latestCard.card))]),
+            _vm.myTurn && !_vm.dealtACard
+              ? _c(
+                  "form",
+                  {
+                    staticClass: "mt-2",
+                    on: {
+                      "~submit": function($event) {
+                        $event.preventDefault()
+                        return _vm.onSubmitTurn($event)
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "submit" }
+                      },
+                      [_vm._v("Deal a card!")]
+                    )
+                  ]
+                )
+              : _vm._e(),
             _vm._v(" "),
-            _c("p", [_vm._v(_vm._s(this.match.latestCard.description))])
-          ])
-        : _vm._e()
-    ],
-    2
-  )
+            _vm.dealtACard
+              ? _c(
+                  "form",
+                  {
+                    staticClass: "mt-2",
+                    on: {
+                      submit: function($event) {
+                        $event.preventDefault()
+                        return _vm.onSubmitComplete($event)
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "submit" }
+                      },
+                      [_vm._v("Complete turn")]
+                    )
+                  ]
+                )
+              : _vm._e()
+          ]),
+          _vm._v(" "),
+          _vm.match.latestCard
+            ? _c("div", { staticClass: "mx-2" }, [
+                _c("img", {
+                  staticStyle: { width: "250px" },
+                  attrs: {
+                    src:
+                      "/images/cards/" +
+                      _vm.match.latestCard.card.replace(/\s/g, "") +
+                      ".png"
+                  }
+                }),
+                _vm._v(" "),
+                _c("p", [_vm._v(_vm._s(this.match.latestCard.card))]),
+                _vm._v(" "),
+                _c("p", [_vm._v(_vm._s(this.match.latestCard.description))])
+              ])
+            : _vm._e()
+        ]
+      )
+    ])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -47954,7 +48117,13 @@ var render = function() {
                             expression: "name"
                           }
                         ],
-                        attrs: { type: "text", id: "name", name: "name" },
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          id: "name",
+                          name: "name",
+                          placeholder: "Player Name"
+                        },
                         domProps: { value: _vm.name },
                         on: {
                           input: function($event) {
@@ -47964,17 +48133,58 @@ var render = function() {
                             _vm.name = $event.target.value
                           }
                         }
-                      })
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary mt-4",
+                          attrs: { type: "submit" }
+                        },
+                        [_vm._v("Create")]
+                      )
                     ]
                   )
                 ])
               ])
             : _vm._e(),
           _vm._v(" "),
+          _vm.isHidden ? _c("Player") : _vm._e(),
+          _vm._v(" "),
           _vm.isHidden ? _c("Create") : _vm._e()
         ],
         1
       )
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Player.vue?vue&type=template&id=11281ee8&":
+/*!*********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Player.vue?vue&type=template&id=11281ee8& ***!
+  \*********************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "card" }, [
+    _c("div", { staticClass: "card-header" }, [_vm._v("Player")]),
+    _vm._v(" "),
+    _c("div", { staticClass: "card-body" }, [
+      _vm._v("\n      " + _vm._s(this.player.name) + "\n  ")
     ])
   ])
 }
@@ -63153,6 +63363,17 @@ module.exports = yeast;
 
 /***/ }),
 
+/***/ "./public/images/cards/blue_back.png":
+/*!*******************************************!*\
+  !*** ./public/images/cards/blue_back.png ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "/images/blue_back.png?8a890151c2b9cbd56a7242210babace6";
+
+/***/ }),
+
 /***/ "./resources/js/app.js":
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
@@ -63423,6 +63644,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/Player.vue":
+/*!********************************************!*\
+  !*** ./resources/js/components/Player.vue ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Player_vue_vue_type_template_id_11281ee8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Player.vue?vue&type=template&id=11281ee8& */ "./resources/js/components/Player.vue?vue&type=template&id=11281ee8&");
+/* harmony import */ var _Player_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player.vue?vue&type=script&lang=js& */ "./resources/js/components/Player.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _Player_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Player_vue_vue_type_template_id_11281ee8___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Player_vue_vue_type_template_id_11281ee8___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Player.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Player.vue?vue&type=script&lang=js&":
+/*!*********************************************************************!*\
+  !*** ./resources/js/components/Player.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Player_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./Player.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Player.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Player_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Player.vue?vue&type=template&id=11281ee8&":
+/*!***************************************************************************!*\
+  !*** ./resources/js/components/Player.vue?vue&type=template&id=11281ee8& ***!
+  \***************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Player_vue_vue_type_template_id_11281ee8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./Player.vue?vue&type=template&id=11281ee8& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Player.vue?vue&type=template&id=11281ee8&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Player_vue_vue_type_template_id_11281ee8___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Player_vue_vue_type_template_id_11281ee8___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/routes.js":
 /*!********************************!*\
   !*** ./resources/js/routes.js ***!
@@ -63446,6 +63736,7 @@ var routes = [{
   component: _components_Game_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
 }];
 /* harmony default export */ __webpack_exports__["default"] = (new vue_router__WEBPACK_IMPORTED_MODULE_0__["default"]({
+  mode: 'history',
   routes: routes
 }));
 

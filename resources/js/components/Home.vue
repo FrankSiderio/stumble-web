@@ -7,12 +7,13 @@
 
                     <div class="card-body">
                         <form @submit.prevent="onSubmit">
-                            <input type="text" id="name" name="name" v-model="name">
+                            <input class="form-control" type="text" id="name" name="name" v-model="name" placeholder="Player Name">
 
+                            <button class="btn btn-primary mt-4" type="submit">Create</button>
                         </form>
                     </div>
                 </div>
-
+                <Player v-if="isHidden" />
                 <Create v-if="isHidden" />
             </div>
         </div>
@@ -21,9 +22,10 @@
 
 <script>
     import Create from '../components/Create.vue';
+    import Player from '../components/Player.vue';
 
     export default {
-        components: { Create },
+        components: { Create, Player },
 
         data() {
             return {

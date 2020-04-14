@@ -10,6 +10,13 @@
     </head>
     <body>
         <div id="app">
+            <div class="p-3 shadow-sm mb-4" style="background-color: #e9ecef">
+                <a class="d-flex justify-content-center text-decoration-none" href="/" style="color: black">
+                    🍺
+                    <h1>Stumble</h1>
+                    🍺
+                </a>
+            </div>
             <router-view></router-view>
         </div>
 
