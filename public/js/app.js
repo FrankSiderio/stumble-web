@@ -2016,7 +2016,7 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     console.log();
-    axios.get("".concat("https://stumble-web.herokuapp.com", "/games")).then(function (response) {
+    axios.get("".concat("https://stumble-api.herokuapp.com", "/games")).then(function (response) {
       if (response.status == 200) {
         _this.games = response.data;
       }
@@ -2033,7 +2033,7 @@ __webpack_require__.r(__webpack_exports__);
     joinMatch: function joinMatch() {
       var _this2 = this;
 
-      axios.post("".concat("https://stumble-web.herokuapp.com", "/match/join"), {
+      axios.post("".concat("https://stumble-api.herokuapp.com", "/match/join"), {
         player: JSON.parse(localStorage.player).id,
         match: this.match
       }).then(function (response) {
@@ -2046,7 +2046,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     createMatch: function createMatch() {
-      axios.post("".concat("https://stumble-web.herokuapp.com", "/match"), {
+      axios.post("".concat("https://stumble-api.herokuapp.com", "/match"), {
         game: this.selectedGame,
         owner: JSON.parse(localStorage.player).id
       }).then(function (response) {
@@ -2122,7 +2122,7 @@ var socket;
 
     this.fetchData().then(function () {
       var socketConnection = function socketConnection() {
-        return socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()("https://stumble-web.herokuapp.com", {
+        return socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()("https://stumble-api.herokuapp.com", {
           query: "match=" + _this.match.identifier
         });
       };
@@ -2185,7 +2185,7 @@ var socket;
     fetchData: function fetchData() {
       var _this2 = this;
 
-      return axios.get("".concat("https://stumble-web.herokuapp.com", "/match/").concat(this.$route.params.identifier)).then(function (response) {
+      return axios.get("".concat("https://stumble-api.herokuapp.com", "/match/").concat(this.$route.params.identifier)).then(function (response) {
         _this2.match = response.data;
 
         _this2.setMyTurn();
@@ -2249,7 +2249,7 @@ __webpack_require__.r(__webpack_exports__);
     onSubmit: function onSubmit() {
       var _this = this;
 
-      axios.post("".concat("https://stumble-web.herokuapp.com", "/player"), {
+      axios.post("".concat("https://stumble-api.herokuapp.com", "/player"), {
         name: this.name
       }).then(function (response) {
         if (response.status == 200) {
