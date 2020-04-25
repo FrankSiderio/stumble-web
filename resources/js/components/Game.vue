@@ -11,7 +11,7 @@
             v-for="(player, index) in this.match.players"
             :key="player.id"
             v-bind:class="{ 'text-danger': index == match.turnIndex }"
-          >{{ player.name }}</p>
+          >{{ getPlayerName(player) }}</p>
         </div>
       </div>
       <div class="d-flex" style="width: min-content">
@@ -111,7 +111,7 @@ export default {
             this.myTurn =
                 this.match.players[this.match.turnIndex].id ==
                 JSON.parse(localStorage.player).id;
-            },
+        },
         fetchData() {
             return axios
                 .get(`${process.env.MIX_API}/match/${this.$route.params.identifier}`)
@@ -119,6 +119,9 @@ export default {
                 this.match = response.data;
                 this.setMyTurn();
                 });
+        },
+        getPlayerName(player) {
+            return `${player.name} ${(JSON.parse(localStorage.player).id === player.id ? ' (Me)' : '')}`
         }
     }
 };

@@ -2190,6 +2190,9 @@ var socket;
 
         _this2.setMyTurn();
       });
+    },
+    getPlayerName: function getPlayerName(player) {
+      return "".concat(player.name, " ").concat(JSON.parse(localStorage.player).id === player.id ? ' (Me)' : '');
     }
   }
 });
@@ -47969,7 +47972,7 @@ var render = function() {
                   key: player.id,
                   class: { "text-danger": index == _vm.match.turnIndex }
                 },
-                [_vm._v(_vm._s(player.name))]
+                [_vm._v(_vm._s(_vm.getPlayerName(player)))]
               )
             }),
             0
