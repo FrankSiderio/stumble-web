@@ -4,8 +4,12 @@
     <p>Game Code - {{ this.match.identifier }}</p>
     <div class="d-flex">
       <div class="card mx-4" style="height: fit-content">
-        <div class="card-header">Players</div>
-
+        <div class="card-header d-flex">
+          <strong>Players</strong>
+          <form class="ml-5" @submit.prevent="onLeave">
+            <button class="btn btn-danger">Leave Game</button>
+          </form>
+        </div>
         <div class="card-body">
           <p
             v-for="(player, index) in this.match.players"
@@ -40,6 +44,7 @@
 </template>
 
 <script>
+import router from '../routes';
 import socketio from "socket.io-client";
 var socket;
 
@@ -105,6 +110,10 @@ export default {
                 socket.emit("completed a turn", this.match.identifier)
                 this.dealtACard = false
             }
+        },
+        onLeave() {
+          socket.emit('player left', { match: this.match.identifier, player: JSON.parse(localStorage.player)})
+          router.push('/')
         },
         setMyTurn() {
             console.log(this.match.turnIndex)

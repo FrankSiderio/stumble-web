@@ -2016,7 +2016,7 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     console.log();
-    axios.get("".concat("https://stumble-api.herokuapp.com", "/games")).then(function (response) {
+    axios.get("".concat("http://127.0.0.1:3333", "/games")).then(function (response) {
       if (response.status == 200) {
         _this.games = response.data;
       }
@@ -2033,7 +2033,7 @@ __webpack_require__.r(__webpack_exports__);
     joinMatch: function joinMatch() {
       var _this2 = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match/join"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match/join"), {
         player: JSON.parse(localStorage.player).id,
         match: this.match
       }).then(function (response) {
@@ -2046,7 +2046,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     createMatch: function createMatch() {
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match"), {
         game: this.selectedGame,
         owner: JSON.parse(localStorage.player).id
       }).then(function (response) {
@@ -2071,8 +2071,9 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../routes */ "./resources/js/routes.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_1__);
 //
 //
 //
@@ -2114,6 +2115,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+
 
 var socket;
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2122,7 +2128,7 @@ var socket;
 
     this.fetchData().then(function () {
       var socketConnection = function socketConnection() {
-        return socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()("https://stumble-api.herokuapp.com", {
+        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("http://127.0.0.1:3333", {
           query: "match=" + _this.match.identifier
         });
       };
@@ -2178,6 +2184,13 @@ var socket;
         this.dealtACard = false;
       }
     },
+    onLeave: function onLeave() {
+      socket.emit('player left', {
+        match: this.match.identifier,
+        player: JSON.parse(localStorage.player)
+      });
+      _routes__WEBPACK_IMPORTED_MODULE_0__["default"].push('/');
+    },
     setMyTurn: function setMyTurn() {
       console.log(this.match.turnIndex);
       this.myTurn = this.match.players[this.match.turnIndex].id == JSON.parse(localStorage.player).id;
@@ -2185,7 +2198,7 @@ var socket;
     fetchData: function fetchData() {
       var _this2 = this;
 
-      return axios.get("".concat("https://stumble-api.herokuapp.com", "/match/").concat(this.$route.params.identifier)).then(function (response) {
+      return axios.get("".concat("http://127.0.0.1:3333", "/match/").concat(this.$route.params.identifier)).then(function (response) {
         _this2.match = response.data;
 
         _this2.setMyTurn();
@@ -2252,7 +2265,7 @@ __webpack_require__.r(__webpack_exports__);
     onSubmit: function onSubmit() {
       var _this = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/player"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/player"), {
         name: this.name
       }).then(function (response) {
         if (response.status == 200) {
@@ -47960,7 +47973,27 @@ var render = function() {
         "div",
         { staticClass: "card mx-4", staticStyle: { height: "fit-content" } },
         [
-          _c("div", { staticClass: "card-header" }, [_vm._v("Players")]),
+          _c("div", { staticClass: "card-header d-flex" }, [
+            _c("strong", [_vm._v("Players")]),
+            _vm._v(" "),
+            _c(
+              "form",
+              {
+                staticClass: "ml-5",
+                on: {
+                  submit: function($event) {
+                    $event.preventDefault()
+                    return _vm.onLeave($event)
+                  }
+                }
+              },
+              [
+                _c("button", { staticClass: "btn btn-danger" }, [
+                  _vm._v("Leave Game")
+                ])
+              ]
+            )
+          ]),
           _vm._v(" "),
           _c(
             "div",
