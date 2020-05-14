@@ -6,14 +6,20 @@
     role="dialog"
     aria-labelledby="drinkModalLabel"
     aria-hidden="true"
+    data-backdrop="static"
   >
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="drinkModalLabel">Who Drank?</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <h4 class="modal-title" id="drinkModalLabel">Who Drank?</h4>
+          <div class="col-8">
+            <img
+              v-bind:src="'/images/cards/' + this.latestCard.card.replace(/\s/g, '') + '.png'"
+              style="width: 50px"
+            />
+            <h6>{{ this.latestCard.card }}</h6>
+            <p>{{ this.latestCard.description }}</p>
+          </div>
         </div>
         <div
           class="modal-body player d-flex justify-content-between"
@@ -32,7 +38,7 @@
             class="btn btn-secondary"
             data-dismiss="modal"
             v-on:click.once="completeTurn"
-          >Done</button>
+          >Complete Turn</button>
         </div>
       </div>
     </div>
@@ -43,7 +49,8 @@
 export default {
   name: "DrinkModal",
   props: {
-    players: Array
+    players: Array,
+    latestCard: Object
   },
   methods: {
     drank(player) {

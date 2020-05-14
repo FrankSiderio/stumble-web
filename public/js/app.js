@@ -2016,7 +2016,7 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     console.log();
-    axios.get("".concat("https://stumble-api.herokuapp.com", "/games")).then(function (response) {
+    axios.get("".concat("http://127.0.0.1:3333", "/games")).then(function (response) {
       if (response.status == 200) {
         _this.games = response.data;
       }
@@ -2033,7 +2033,7 @@ __webpack_require__.r(__webpack_exports__);
     joinMatch: function joinMatch() {
       var _this2 = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match/join"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match/join"), {
         player: JSON.parse(localStorage.player).id,
         match: this.match
       }).then(function (response) {
@@ -2046,7 +2046,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     createMatch: function createMatch() {
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match"), {
         game: this.selectedGame,
         owner: JSON.parse(localStorage.player).id
       }).then(function (response) {
@@ -2112,15 +2112,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "DrinkModal",
   props: {
-    players: Array
+    players: Array,
+    latestCard: Object
   },
   methods: {
     drank: function drank(player) {
       this.$refs[player.id][0].hidden = false;
-      return axios.post("".concat("https://stumble-api.herokuapp.com", "/match/drink"), {
+      return axios.post("".concat("http://127.0.0.1:3333", "/match/drink"), {
         player: player.id,
         match: this.$route.params.identifier
       }).then(function (response) {
@@ -2208,7 +2215,7 @@ var socket;
 
     this.fetchData().then(function () {
       var socketConnection = function socketConnection() {
-        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("https://stumble-api.herokuapp.com", {
+        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("http://127.0.0.1:3333", {
           query: "match=" + _this.match.identifier
         });
       };
@@ -2277,7 +2284,7 @@ var socket;
     fetchData: function fetchData() {
       var _this2 = this;
 
-      return axios.get("".concat("https://stumble-api.herokuapp.com", "/match/").concat(this.$route.params.identifier)).then(function (response) {
+      return axios.get("".concat("http://127.0.0.1:3333", "/match/").concat(this.$route.params.identifier)).then(function (response) {
         _this2.match = response.data;
 
         _this2.setMyTurn();
@@ -2358,7 +2365,7 @@ __webpack_require__.r(__webpack_exports__);
     onSubmit: function onSubmit() {
       var _this = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/player"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/player"), {
         name: this.name
       }).then(function (response) {
         if (response.status == 200) {
@@ -48710,7 +48717,8 @@ var render = function() {
         tabindex: "-1",
         role: "dialog",
         "aria-labelledby": "drinkModalLabel",
-        "aria-hidden": "true"
+        "aria-hidden": "true",
+        "data-backdrop": "static"
       }
     },
     [
@@ -48719,7 +48727,32 @@ var render = function() {
           "div",
           { staticClass: "modal-content" },
           [
-            _vm._m(0),
+            _c("div", { staticClass: "modal-header" }, [
+              _c(
+                "h4",
+                {
+                  staticClass: "modal-title",
+                  attrs: { id: "drinkModalLabel" }
+                },
+                [_vm._v("Who Drank?")]
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-8" }, [
+                _c("img", {
+                  staticStyle: { width: "50px" },
+                  attrs: {
+                    src:
+                      "/images/cards/" +
+                      this.latestCard.card.replace(/\s/g, "") +
+                      ".png"
+                  }
+                }),
+                _vm._v(" "),
+                _c("h6", [_vm._v(_vm._s(this.latestCard.card))]),
+                _vm._v(" "),
+                _c("p", [_vm._v(_vm._s(this.latestCard.description))])
+              ])
+            ]),
             _vm._v(" "),
             _vm._l(this.players, function(player) {
               return _c(
@@ -48759,7 +48792,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("Done")]
+                [_vm._v("Complete Turn")]
               )
             ])
           ],
@@ -48769,33 +48802,7 @@ var render = function() {
     ]
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-header" }, [
-      _c(
-        "h5",
-        { staticClass: "modal-title", attrs: { id: "drinkModalLabel" } },
-        [_vm._v("Who Drank?")]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "close",
-          attrs: {
-            type: "button",
-            "data-dismiss": "modal",
-            "aria-label": "Close"
-          }
-        },
-        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-      )
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -48919,7 +48926,10 @@ var render = function() {
               _vm._v(" "),
               _c("drink-modal", {
                 key: _vm.modalKey,
-                attrs: { players: _vm.match.players }
+                attrs: {
+                  players: _vm.match.players,
+                  latestCard: _vm.match.latestCard
+                }
               })
             ],
             1

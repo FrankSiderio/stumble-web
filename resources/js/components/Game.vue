@@ -29,7 +29,7 @@
           <form class="mt-2" v-if="myTurn && !dealtACard" @submit.prevent.once="onSubmitTurn">
             <button class="btn btn-primary" type="submit" data-toggle="modal" data-target="#drinkModal">Deal a card!</button>
           </form>
-          <drink-modal v-bind:players="match.players" :key="modalKey"></drink-modal>
+          <drink-modal v-bind:players="match.players" v-bind:latestCard="match.latestCard" :key="modalKey"></drink-modal>
         </div>
 
         <div class="mx-2" v-if="match.latestCard">
