@@ -26,7 +26,7 @@
           style="cursor: pointer"
           v-for="(player) in this.players"
           :key="player.id"
-          v-on:click.once="drank(player)"
+          v-on:click="drank(player)"
         >
           <p>{{ player.name }}</p>
 
@@ -54,15 +54,34 @@ export default {
   },
   methods: {
     drank(player) {
-      this.$refs[player.id][0].hidden = false;
-
+      if (this.$refs[player.id][0].hidden) return this.addDrank(player)
+        
+      return this.removeDrank(player)
+    },
+    addDrank(player) {
       return axios
         .post(`${process.env.MIX_API}/match/drink`, {
           player: player.id,
           match: this.$route.params.identifier
         })
         .then(response => {
-          console.log(response);
+          if (response.status === 200) {
+            this.$refs[player.id][0].hidden = false;
+          }
+        });
+    },
+    removeDrank(player) {
+      return axios
+        .delete(`${process.env.MIX_API}/match/drink`, {
+          data: {
+            player: player.id,
+            match: this.$route.params.identifier
+          }
+        })
+        .then(response => {
+          if (response.status === 200) {
+            this.$refs[player.id][0].hidden = true;
+          }
         });
     },
     completeTurn() {
@@ -73,6 +92,7 @@ export default {
 </script>
 <style scoped>
 .player:hover {
-  background-color: #6c757d;
+  background-color: #3490dc;
+  color: white;
 }
 </style>

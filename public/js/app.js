@@ -2010,13 +2010,25 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
 
-    console.log();
-    axios.get("".concat("https://stumble-api.herokuapp.com", "/games")).then(function (response) {
+    axios.get("".concat("http://127.0.0.1:3333", "/games")).then(function (response) {
       if (response.status == 200) {
         _this.games = response.data;
       }
@@ -2024,34 +2036,37 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      match: '',
-      selectedGame: '',
-      games: []
+      match: "",
+      selectedGame: "",
+      games: [],
+      error: undefined
     };
   },
   methods: {
     joinMatch: function joinMatch() {
       var _this2 = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match/join"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match/join"), {
         player: JSON.parse(localStorage.player).id,
         match: this.match
       }).then(function (response) {
-        console.log(response.data);
-
         if (response.status == 200) {
           _routes__WEBPACK_IMPORTED_MODULE_0__["default"].push("/match/".concat(_this2.match));
-        } // TODO: Add error message if we can't find match
-
+        }
+      })["catch"](function (error) {
+        if (error.response.status == 404) {
+          _this2.error = "Can't find any game with the code - ".concat(_this2.match);
+          _this2.match = '';
+        } else {
+          _this2.error = 'Something went wrong :(';
+        }
       });
     },
     createMatch: function createMatch() {
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match"), {
         game: this.selectedGame,
         owner: JSON.parse(localStorage.player).id
       }).then(function (response) {
-        console.log(response.data.match.identifier);
-
         if (response.status == 200) {
           _routes__WEBPACK_IMPORTED_MODULE_0__["default"].push("/match/".concat(response.data.match.identifier));
         }
@@ -2126,12 +2141,33 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     drank: function drank(player) {
-      this.$refs[player.id][0].hidden = false;
-      return axios.post("".concat("https://stumble-api.herokuapp.com", "/match/drink"), {
+      if (this.$refs[player.id][0].hidden) return this.addDrank(player);
+      return this.removeDrank(player);
+    },
+    addDrank: function addDrank(player) {
+      var _this = this;
+
+      return axios.post("".concat("http://127.0.0.1:3333", "/match/drink"), {
         player: player.id,
         match: this.$route.params.identifier
       }).then(function (response) {
-        console.log(response);
+        if (response.status === 200) {
+          _this.$refs[player.id][0].hidden = false;
+        }
+      });
+    },
+    removeDrank: function removeDrank(player) {
+      var _this2 = this;
+
+      return axios["delete"]("".concat("http://127.0.0.1:3333", "/match/drink"), {
+        data: {
+          player: player.id,
+          match: this.$route.params.identifier
+        }
+      }).then(function (response) {
+        if (response.status === 200) {
+          _this2.$refs[player.id][0].hidden = true;
+        }
       });
     },
     completeTurn: function completeTurn() {
@@ -2215,7 +2251,7 @@ var socket;
 
     this.fetchData().then(function () {
       var socketConnection = function socketConnection() {
-        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("https://stumble-api.herokuapp.com", {
+        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("http://127.0.0.1:3333", {
           query: "match=" + _this.match.identifier
         });
       };
@@ -2284,7 +2320,7 @@ var socket;
     fetchData: function fetchData() {
       var _this2 = this;
 
-      return axios.get("".concat("https://stumble-api.herokuapp.com", "/match/").concat(this.$route.params.identifier)).then(function (response) {
+      return axios.get("".concat("http://127.0.0.1:3333", "/match/").concat(this.$route.params.identifier)).then(function (response) {
         _this2.match = response.data;
 
         _this2.setMyTurn();
@@ -2365,7 +2401,7 @@ __webpack_require__.r(__webpack_exports__);
     onSubmit: function onSubmit() {
       var _this = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/player"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/player"), {
         name: this.name
       }).then(function (response) {
         if (response.status == 200) {
@@ -9255,7 +9291,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.player[data-v-32383b20]:hover {\n  background-color: #6c757d;\n}\n", ""]);
+exports.push([module.i, "\n.player[data-v-32383b20]:hover {\n  background-color: #3490dc;\n  color: white;\n}\n", ""]);
 
 // exports
 
@@ -48570,6 +48606,17 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "card-body" }, [
+      _vm.error
+        ? _c(
+            "div",
+            {
+              staticClass: "alert alert-danger alert-dismissible fade show",
+              attrs: { role: "alert" }
+            },
+            [_vm._v("\n      " + _vm._s(this.error) + "\n      "), _vm._m(0)]
+          )
+        : _vm._e(),
+      _vm._v(" "),
       _c(
         "form",
         {
@@ -48662,7 +48709,7 @@ var render = function() {
               _c(
                 "option",
                 { attrs: { disabled: "", selected: "", value: "" } },
-                [_vm._v(" -- select a game -- ")]
+                [_vm._v("-- select a game --")]
               ),
               _vm._v(" "),
               _vm._l(this.games, function(game) {
@@ -48686,7 +48733,25 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "alert",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
+  }
+]
 render._withStripped = true
 
 
@@ -48763,7 +48828,7 @@ var render = function() {
                     "modal-body player d-flex justify-content-between",
                   staticStyle: { cursor: "pointer" },
                   on: {
-                    "~click": function($event) {
+                    click: function($event) {
                       return _vm.drank(player)
                     }
                   }
