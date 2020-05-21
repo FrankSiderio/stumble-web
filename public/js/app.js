@@ -2028,7 +2028,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    axios.get("".concat("http://127.0.0.1:3333", "/games")).then(function (response) {
+    axios.get("".concat("https://stumble-api.herokuapp.com", "/games")).then(function (response) {
       if (response.status == 200) {
         _this.games = response.data;
       }
@@ -2046,7 +2046,7 @@ __webpack_require__.r(__webpack_exports__);
     joinMatch: function joinMatch() {
       var _this2 = this;
 
-      axios.post("".concat("http://127.0.0.1:3333", "/match/join"), {
+      axios.post("".concat("https://stumble-api.herokuapp.com", "/match/join"), {
         player: JSON.parse(localStorage.player).id,
         match: this.match
       }).then(function (response) {
@@ -2063,7 +2063,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     createMatch: function createMatch() {
-      axios.post("".concat("http://127.0.0.1:3333", "/match"), {
+      axios.post("".concat("https://stumble-api.herokuapp.com", "/match"), {
         game: this.selectedGame,
         owner: JSON.parse(localStorage.player).id
       }).then(function (response) {
@@ -2147,7 +2147,7 @@ __webpack_require__.r(__webpack_exports__);
     addDrank: function addDrank(player) {
       var _this = this;
 
-      return axios.post("".concat("http://127.0.0.1:3333", "/match/drink"), {
+      return axios.post("".concat("https://stumble-api.herokuapp.com", "/match/drink"), {
         player: player.id,
         match: this.$route.params.identifier
       }).then(function (response) {
@@ -2159,7 +2159,7 @@ __webpack_require__.r(__webpack_exports__);
     removeDrank: function removeDrank(player) {
       var _this2 = this;
 
-      return axios["delete"]("".concat("http://127.0.0.1:3333", "/match/drink"), {
+      return axios["delete"]("".concat("https://stumble-api.herokuapp.com", "/match/drink"), {
         data: {
           player: player.id,
           match: this.$route.params.identifier
@@ -2251,7 +2251,7 @@ var socket;
 
     this.fetchData().then(function () {
       var socketConnection = function socketConnection() {
-        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("http://127.0.0.1:3333", {
+        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("https://stumble-api.herokuapp.com", {
           query: "match=" + _this.match.identifier
         });
       };
@@ -2320,7 +2320,7 @@ var socket;
     fetchData: function fetchData() {
       var _this2 = this;
 
-      return axios.get("".concat("http://127.0.0.1:3333", "/match/").concat(this.$route.params.identifier)).then(function (response) {
+      return axios.get("".concat("https://stumble-api.herokuapp.com", "/match/").concat(this.$route.params.identifier)).then(function (response) {
         _this2.match = response.data;
 
         _this2.setMyTurn();
@@ -2401,7 +2401,7 @@ __webpack_require__.r(__webpack_exports__);
     onSubmit: function onSubmit() {
       var _this = this;
 
-      axios.post("".concat("http://127.0.0.1:3333", "/player"), {
+      axios.post("".concat("https://stumble-api.herokuapp.com", "/player"), {
         name: this.name
       }).then(function (response) {
         if (response.status == 200) {
