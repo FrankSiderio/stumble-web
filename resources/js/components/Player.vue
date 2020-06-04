@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-header d-flex justify-content-between">
-      Player
+      <strong>Player</strong>
       <img
         v-on:click="handleClick"
         src="../../../public/images/icons/pencil.png"

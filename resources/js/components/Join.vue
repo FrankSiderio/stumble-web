@@ -1,6 +1,6 @@
 <template>
   <div class="card mt-4">
-    <div class="card-header">Create a Game</div>
+    <div class="card-header">Join a Game</div>
 
     <div class="card-body">
       <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -9,13 +9,17 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+      <form class="d-flex" @submit.prevent="joinMatch">
+        <input
+          class="form-control mr-4"
+          type="text"
+          id="match"
+          name="match"
+          v-model="match"
+          placeholder="Game Code"
+        />
 
-      <form class="d-flex" @submit.prevent="createMatch">
-        <select class="form-control mr-4" name="people" v-model="selectedGame">
-          <option disabled selected value>-- select a game --</option>
-          <option v-for="game in this.games" :key="game.id" v-bind:value="game.id">{{ game.name }}</option>
-        </select>
-        <button class="btn btn-primary" type="submit">Create</button>
+        <button class="btn btn-primary" type="submit">Join</button>
       </form>
     </div>
   </div>
@@ -25,14 +29,11 @@
 import router from "../routes";
 
 export default {
-  props: {
-    games: Array
-  },
-  
   data() {
     return {
       match: "",
       selectedGame: "",
+      games: [],
       error: undefined
     };
   },
@@ -51,23 +52,10 @@ export default {
         })
         .catch(error => {
           if (error.response.status == 404) {
-            this.error = `Can\'t find any game with the code - ${this.match}`
+            this.error = `Game not found with code - ${this.match}`
             this.match = ''
           } else {
             this.error = 'Something went wrong :('
-          }
-        });
-    },
-
-    createMatch() {
-      axios
-        .post(`${process.env.MIX_API}/match`, {
-          game: this.selectedGame,
-          owner: JSON.parse(localStorage.player).id
-        })
-        .then(response => {
-          if (response.status == 200) {
-            router.push(`/match/${response.data.match.identifier}`);
           }
         });
     }

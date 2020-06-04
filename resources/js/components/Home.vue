@@ -20,8 +20,14 @@
             </form>
           </div>
         </div>
-        <Player v-if="isHidden" />
-        <Create v-if="isHidden" />
+        <div v-if="isHidden">
+          <Player />
+
+          <div class="d-flex justify-content-between">
+            <Join />
+            <Create v-bind:games="this.games" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -29,20 +35,29 @@
 
 <script>
 import Create from "../components/Create.vue";
+import Join from "../components/Join.vue";
 import Player from "../components/Player.vue";
 
 export default {
-  components: { Create, Player },
+  components: { Create, Player, Join },
 
   data() {
     return {
       name: "",
-      isHidden: localStorage.player ? true : false
-    };
+      isHidden: localStorage.player ? true : false,
+      match: "",
+      selectedGame: "",
+      games: [],
+      error: undefined
+    }
   },
 
   mounted() {
-    console.log("Component mounted.");
+    axios.get(`${process.env.MIX_API}/games`).then(response => {
+      if (response.status == 200) {
+        this.games = response.data;
+      }
+    })
   },
 
   methods: {
@@ -51,11 +66,11 @@ export default {
         .post(`${process.env.MIX_API}/player`, { name: this.name })
         .then(response => {
           if (response.status == 200) {
-            localStorage.player = JSON.stringify(response.data.player);
-            this.isHidden = true;
+            localStorage.player = JSON.stringify(response.data.player)
+            this.isHidden = true
           }
         })
-        .catch(error => console.log(error));
+        .catch(error => console.log(error))
     }
   }
 };
