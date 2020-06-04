@@ -2028,7 +2028,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    axios.get("".concat("https://stumble-api.herokuapp.com", "/games")).then(function (response) {
+    axios.get("".concat("http://127.0.0.1:3333", "/games")).then(function (response) {
       if (response.status == 200) {
         _this.games = response.data;
       }
@@ -2046,7 +2046,7 @@ __webpack_require__.r(__webpack_exports__);
     joinMatch: function joinMatch() {
       var _this2 = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match/join"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match/join"), {
         player: JSON.parse(localStorage.player).id,
         match: this.match
       }).then(function (response) {
@@ -2063,7 +2063,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     createMatch: function createMatch() {
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/match"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/match"), {
         game: this.selectedGame,
         owner: JSON.parse(localStorage.player).id
       }).then(function (response) {
@@ -2147,7 +2147,7 @@ __webpack_require__.r(__webpack_exports__);
     addDrank: function addDrank(player) {
       var _this = this;
 
-      return axios.post("".concat("https://stumble-api.herokuapp.com", "/match/drink"), {
+      return axios.post("".concat("http://127.0.0.1:3333", "/match/drink"), {
         player: player.id,
         match: this.$route.params.identifier
       }).then(function (response) {
@@ -2159,7 +2159,7 @@ __webpack_require__.r(__webpack_exports__);
     removeDrank: function removeDrank(player) {
       var _this2 = this;
 
-      return axios["delete"]("".concat("https://stumble-api.herokuapp.com", "/match/drink"), {
+      return axios["delete"]("".concat("http://127.0.0.1:3333", "/match/drink"), {
         data: {
           player: player.id,
           match: this.$route.params.identifier
@@ -2251,7 +2251,7 @@ var socket;
 
     this.fetchData().then(function () {
       var socketConnection = function socketConnection() {
-        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("https://stumble-api.herokuapp.com", {
+        return socket_io_client__WEBPACK_IMPORTED_MODULE_1___default()("http://127.0.0.1:3333", {
           query: "match=" + _this.match.identifier
         });
       };
@@ -2320,7 +2320,7 @@ var socket;
     fetchData: function fetchData() {
       var _this2 = this;
 
-      return axios.get("".concat("https://stumble-api.herokuapp.com", "/match/").concat(this.$route.params.identifier)).then(function (response) {
+      return axios.get("".concat("http://127.0.0.1:3333", "/match/").concat(this.$route.params.identifier)).then(function (response) {
         _this2.match = response.data;
 
         _this2.setMyTurn();
@@ -2401,7 +2401,7 @@ __webpack_require__.r(__webpack_exports__);
     onSubmit: function onSubmit() {
       var _this = this;
 
-      axios.post("".concat("https://stumble-api.herokuapp.com", "/player"), {
+      axios.post("".concat("http://127.0.0.1:3333", "/player"), {
         name: this.name
       }).then(function (response) {
         if (response.status == 200) {
@@ -2436,11 +2436,45 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      player: JSON.parse(localStorage.player)
+      player: JSON.parse(localStorage.player),
+      canEditName: false
     };
+  },
+  methods: {
+    handleClick: function handleClick() {
+      this.canEditName = !this.canEditName;
+    },
+    onSubmit: function onSubmit() {
+      var _this = this;
+
+      axios.put("".concat("http://127.0.0.1:3333", "/player"), {
+        currentName: JSON.parse(localStorage.player).name,
+        newName: this.player.name,
+        id: this.player.id
+      }).then(function (response) {
+        if (response.status == 200) {
+          localStorage.player = JSON.stringify(response.data.player);
+          _this.canEditName = false;
+        }
+      })["catch"](function (error) {
+        return console.log(error);
+      });
+    }
   }
 });
 
@@ -49141,10 +49175,61 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "card" }, [
-    _c("div", { staticClass: "card-header" }, [_vm._v("Player")]),
+    _c("div", { staticClass: "card-header d-flex justify-content-between" }, [
+      _vm._v("\n    Player\n    "),
+      _c("img", {
+        staticStyle: { width: "20px", height: "20px", cursor: "pointer" },
+        attrs: { src: __webpack_require__(/*! ../../../public/images/icons/pencil.png */ "./public/images/icons/pencil.png") },
+        on: { click: _vm.handleClick }
+      })
+    ]),
     _vm._v(" "),
     _c("div", { staticClass: "card-body" }, [
-      _vm._v("\n      " + _vm._s(this.player.name) + "\n  ")
+      _vm.canEditName
+        ? _c(
+            "form",
+            {
+              staticClass: "d-flex",
+              on: {
+                "~submit": function($event) {
+                  $event.preventDefault()
+                  return _vm.onSubmit($event)
+                }
+              }
+            },
+            [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.player.name,
+                    expression: "player.name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text", name: "name" },
+                domProps: { value: _vm.player.name },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.player, "name", $event.target.value)
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("button", { staticClass: "btn btn-primary ml-2" }, [
+                _vm._v("Update")
+              ])
+            ]
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      !_vm.canEditName
+        ? _c("p", { staticClass: "m-0" }, [_vm._v(_vm._s(this.player.name))])
+        : _vm._e()
     ])
   ])
 }
@@ -64331,6 +64416,17 @@ module.exports = yeast;
 /***/ (function(module, exports) {
 
 module.exports = "/images/blue_back.png?8a890151c2b9cbd56a7242210babace6";
+
+/***/ }),
+
+/***/ "./public/images/icons/pencil.png":
+/*!****************************************!*\
+  !*** ./public/images/icons/pencil.png ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "/images/pencil.png?b36651e0069d2576244bda70a75a1bc3";
 
 /***/ }),
 
